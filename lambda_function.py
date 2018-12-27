@@ -86,10 +86,15 @@ type (mysql or postgresql) and username"
 
     else:
         secret = get_secret(os.getenv('DB_PREFIX', '') + db_name)
+        if not secret:
+            log_error_with_event('Secret is None.', '')
+            return None
+
         db_instance = None
         if db_type == 'mysql':
             db_instance = Mysql(**secret)
-        elif db_type == 'postgresql':
+
+        elif db_type in ('postgresql','postgres'):
             db_instance = Postgresql(**secret)
         
         db_info = {
@@ -105,9 +110,8 @@ type (mysql or postgresql) and username"
         db_info["username"] = username
         db_info["passw"] = passw
            
-        if not get_new_password(db_instance, username, passw):
-            create_new_user(db_instance, username, passw)
-            
-        return db_info
-    
+        if (get_new_password(db_instance, username, passw)
+            or create_new_user(db_instance, username, passw)):
+                return db_info
+
     return None

@@ -7,3 +7,6 @@ class Database:
 
     def get_new_password(self, user, passw):
         raise NotImplementedError
+
+    def get_db_version(self):
+        raise NotImplementedError
